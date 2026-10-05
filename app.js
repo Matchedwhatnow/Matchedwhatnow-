@@ -77,7 +77,7 @@ const labels={funny:"Funny & Playful",profile:"Profile-Specific",flirty:"Flirty"
 let current="funny", favorites=JSON.parse(localStorage.getItem("mwn_favs")||"[]");
 function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
 function renderCats(){document.querySelector("#cats").innerHTML=Object.keys(DATA).map(k=>`<button class="chip ${k===current?'on':''}" onclick="pick('${k}')">${labels[k]}</button>`).join("");}
-function render(list=DATA[current]){document.querySelector("#title").textContent=labels[current]; document.querySelector("#cards").innerHTML=list.map((m,i)=>`<article class="card"><p>${esc(m)}</p><div><button onclick='copyMsg(${JSON.stringify(m)})'>Copy</button><button class="ghost" onclick='fav(${JSON.stringify(m)})'>${favorites.includes(m)?"★ Saved":"☆ Save"}</button></div></article>`).join("")||"<p class='muted'>No messages found.</p>";}
+function render(list=DATA[current]){document.querySelector("#title").textContent=current==="all"?"All Messages":LABELS[current]||"Messages";document.querySelector("#cards").innerHTML=list.map(m=>`<article class="card"><p>${esc(m)}</p><div><button onclick='copyMsg(${JSON.stringify(m)})'>Copy</button><button onclick='saveMsg(${JSON.stringify(m)})'>☆ Save</button></div></article>`).join("");}
 function pick(k){current=k; document.querySelector("#search").value=""; renderCats(); render();}
 async function copyMsg(m){await navigator.clipboard.writeText(m); toast("Copied to clipboard");}
 function fav(m){favorites=favorites.includes(m)?favorites.filter(x=>x!==m):[...favorites,m];localStorage.setItem("mwn_favs",JSON.stringify(favorites));render();}
@@ -87,3 +87,4 @@ function build(){let d=document.querySelector("#detail").value.trim(), r=documen
 function searchMsgs(q){q=q.toLowerCase(); if(!q)return render(); let all=Object.values(DATA).flat().filter(m=>m.toLowerCase().includes(q));document.querySelector("#title").textContent="Search Results";render(all);}
 function toast(t){let x=document.querySelector("#toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1400);}
 renderCats();render();
+
